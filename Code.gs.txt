@@ -1,0 +1,37 @@
+/**
+ * Namngiap 2AB Power Management System
+ * Backend Logic for Google Apps Script
+ */
+
+const APP_TITLE = "Namngiap 2AB Power";
+
+function doGet() {
+  return HtmlService.createHtmlOutputFromFile('index')
+    .setTitle(APP_TITLE)
+    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
+    .addMetaTag('viewport', 'width=device-width, initial-scale=1');
+}
+
+// จำลองการดึงข้อมูลและบันทึก (ในระบบจริงควรเชื่อมกับ Google Sheets)
+function saveData(payload) {
+  try {
+    // ตรวจสอบเงื่อนไขวันที่ 29 เพื่อลบข้อมูล (จำลอง)
+    const today = new Date();
+    if (today.getDate() === 29) {
+      // ตรรกะการล้างข้อมูล
+      console.log("Cleaning up data for the 29th...");
+    }
+    
+    // บันทึกข้อมูล (ตัวอย่างการส่งค่ากลับ)
+    return { success: true, message: "บันทึกข้อมูลสำเร็จ (บันทึกเข้าระบบแล้ว)" };
+  } catch (e) {
+    return { success: false, message: e.toString() };
+  }
+}
+
+function fetchAllRecords() {
+  // จำลองข้อมูลที่บันทึกไว้
+  return [
+    { id: 1, name: "สมชาย", position: "วิศวกร", month: "02/2024", date: new Date().toISOString() }
+  ];
+}

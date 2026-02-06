@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="lo">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Namngiap 2AB Power</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Lao:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Noto Sans Lao', sans-serif; background-color: #f3f4f6; }
+        .hidden { display: none; }
+        .table-container { overflow-x: auto; }
+        th, td { border: 1px solid #e5e7eb; padding: 8px; text-align: center; font-size: 0.875rem; }
+        th { background-color: #f9fafb; }
+        .input-auto { background-color: #eef2ff; border: 1px dashed #6366f1; }
+        .history-card { background: white; border-top: 4px solid #3b82f6; }
+    </style>
+</head>
+<body>
+
+<div id="app" class="min-h-screen flex flex-col">
+    <!-- 1. LOGIN PAGE -->
+    <div id="loginPage" class="flex-grow flex items-center justify-center p-4">
+        <div class="bg-white p-8 rounded-xl shadow-lg w-full max-w-md">
+            <h1 class="text-2xl font-bold text-center text-blue-800 mb-2">Namngiap 2AB Power</h1>
+            <p class="text-center text-gray-500 mb-6 text-sm">ກະລຸນາປ້ອນຂໍ້ມູນເພື່ອເຂົ້າສູ່ລະບົບ</p>
+            
+            <form onsubmit="event.preventDefault(); handleLogin();" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">ອີເມວ (Email)</label>
+                    <input type="email" id="loginEmail" 
+                           placeholder="Namngiap2ABPower@gmail.com" 
+                           class="w-full p-3 border rounded-lg mt-1 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                           required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">ລະຫັດຜ່ານ (Password)</label>
+                    <input type="password" id="loginPassword" 
+                           placeholder="••••••••" 
+                           class="w-full p-3 border rounded-lg mt-1 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                           required>
+                </div>
+                <button type="submit" 
+                        class="w-full bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700 transition shadow-md">
+                    ເຂົ້າສູ່ລະບົບ
+                </button>
+            </form>
+
+            <div class="mt-6 text-center text-sm text-gray-500 border-t pt-4">
+                <p>ລົງທະບຽນໃໝ່? <button class="text-blue-600 hover:underline">ຕິດຕໍ່ຜູ້ດູແລລະບົບ</button></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. DASHBOARD PAGE -->
+    <div id="dashboardPage" class="hidden p-4 md:p-8">
+        <div class="max-w-7xl mx-auto space-y-8">
+            
+            <div class="bg-white rounded-xl shadow-md p-6 border-t-4 border-blue-600">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+                    <div>
+                        <h2 class="text-xl font-bold text-blue-900">ໃບຕິດຕາມວັນງານຂອງພະນັກງານ</h2>
+                        <p class="text-gray-600">ໂຄງການເຂື່ອນໄຟຟ້ານ້ຳງຽບ 2ab ຈຳກັດຜູ້ດຽວ</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="scrollToHistory()" class="bg-blue-50 text-blue-600 px-4 py-2 rounded border border-blue-200 hover:bg-blue-100 flex items-center gap-1">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            ລາຍການທີ່ບັນທຶກແລ້ວ
+                        </button>
+                        <button onclick="logout()" class="bg-red-50 text-red-600 px-4 py-2 rounded border border-red-200 hover:bg-red-100 flex items-center gap-1">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                            ອອກຈາກລະບົບ
+                        </button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div class="p-4 bg-blue-50 rounded-lg">
+                        <label class="block text-xs text-blue-600 uppercase font-bold">ຊື່ ແລະ ນາມສະກຸນ</label>
+                        <input type="text" id="staffName" placeholder="ໃສ່ຊື່ພະນັກງານ" class="w-full bg-transparent border-b border-blue-200 focus:outline-none py-1">
+                    </div>
+                    <div class="p-4 bg-blue-50 rounded-lg">
+                        <label class="block text-xs text-blue-600 uppercase font-bold">ໜ້າທີ່ຮັບຜິດຊອບ</label>
+                        <input type="text" id="staffRole" placeholder="ລະບຸໜ້າທີ່" class="w-full bg-transparent border-b border-blue-200 focus:outline-none py-1">
+                    </div>
+                    <div class="p-4 bg-blue-50 rounded-lg">
+                        <label class="block text-xs text-blue-600 uppercase font-bold">ປະຈຳເດືອນ</label>
+                        <input type="month" id="workMonth" class="w-full bg-transparent border-b border-blue-200 focus:outline-none py-1">
+                    </div>
+                </div>
+
+                <!-- TABLE 1 -->
+                <div class="mb-10">
+                    <div class="flex justify-between items-end mb-2">
+                        <h3 class="font-bold border-l-4 border-blue-600 pl-2">ຕາຕະລາງການເຮັດວຽກ</h3>
+                        <div class="text-xs text-gray-500 italic">* ຫ້ອງສີຟ້າຈະປ່ຽນຂໍ້ມູນໃຫ້ທັງເດືອນ (1-31) ອັດຕະໂນມັດ</div>
+                    </div>
+                    <div class="table-container">
+                        <table class="w-full min-w-[1200px]">
+                            <thead>
+                                <tr>
+                                    <th rowspan="2">ວັນທີ</th>
+                                    <th rowspan="2">ໜ້າວຽກປະຕິບັດ</th>
+                                    <th colspan="2">ກະຊ້າ (In/Out)</th>
+                                    <th colspan="2">ກະແລງ (In/Out)</th>
+                                    <th colspan="2">ກະເດີກ (In/Out)</th>
+                                    <th colspan="3">ຊົ່ວໂມງ</th>
+                                    <th rowspan="2">ລາຍເຊັນຜູ້ຕິດຕາມ</th>
+                                </tr>
+                                <tr>
+                                    <th>ເຂົ້າ</th><th>ອອກ</th>
+                                    <th>ເຂົ້າ</th><th>ອອກ</th>
+                                    <th>ເຂົ້າ</th><th>ອອກ</th>
+                                    <th>ທຳມະດາ</th><th>OT ປົກກະຕິ</th><th>OT ວັນພັກ</th>
+                                </tr>
+                            </thead>
+                            <tbody id="mainTableBody"></tbody>
+                            <tfoot>
+                                <tr class="bg-gray-50 font-bold text-blue-900">
+                                    <td colspan="8" class="text-right px-4 uppercase text-xs">ລວມທັງໝົດ:</td>
+                                    <td id="totalNormal">0</td>
+                                    <td id="totalOT">0</td>
+                                    <td id="totalHoliday">0</td>
+                                    <td>-</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Location Section -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10 p-6 bg-gray-50 rounded-xl">
+                    <div>
+                        <label class="block font-bold mb-2">ສະຖານທີ່: ຊຽງຂວາງ</label>
+                        <input type="text" id="locationInput" value="ຊຽງຂວາງ" class="w-full p-2 border rounded">
+                    </div>
+                    <div>
+                        <label class="block font-bold mb-2">ຜູ້ສະຫຼຸບ (Admin Sign-off)</label>
+                        <button id="adminSignBtn" onclick="adminSign('F', '111', this)" class="w-full py-3 border-2 border-dashed border-gray-300 rounded text-gray-400 hover:border-blue-500 hover:text-blue-500 transition">
+                            ກົດເພື່ອເຊັນຊື່ (User F)
+                        </button>
+                    </div>
+                </div>
+
+                <!-- TABLE 2 -->
+                <div class="mb-10">
+                    <h3 class="font-bold border-l-4 border-orange-600 pl-2 mb-4 text-orange-800">ແບບຟອມເຮັດວຽກລ່ວງເວລາ (OT)</h3>
+                    <div class="table-container">
+                        <table class="w-full min-w-[1000px]">
+                            <thead>
+                                <tr>
+                                    <th>ລຳດັບ</th>
+                                    <th>ວັນທີ</th>
+                                    <th>ເວລາເລີ່ມ/ຢຸດ</th>
+                                    <th>ໜ້າວຽກປະຕິບັດ (Auto)</th>
+                                    <th>ຜົນປະຕິບັດ (Auto)</th>
+                                    <th>ເຊັນຜູ້ໃຫ້ປະຕິບັດ</th>
+                                </tr>
+                            </thead>
+                            <tbody id="otTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Bottom Signatures -->
+                <div id="bottomSignatures" class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+                    <div class="p-4 border rounded text-center bg-white shadow-sm">
+                        <p class="font-bold mb-4 text-gray-700">ເຊັນຝ່າຍບໍລິຫານ</p>
+                        <button id="signAdmin" onclick="adminSign('Admin', '555', this)" class="text-xs text-blue-500 hover:text-blue-700 underline transition">ກົດເຊັນຊື່ (Admin)</button>
+                    </div>
+                    <div class="p-4 border rounded text-center bg-white shadow-sm">
+                        <p class="font-bold mb-4 text-gray-700">ເຊັນຫົວໜ້າສາຍງານ</p>
+                        <div class="flex justify-center gap-3">
+                            <button id="signF" onclick="adminSign('F', '111', this)" class="px-2 py-1 bg-gray-50 rounded border text-xs text-blue-500 hover:bg-blue-50 transition">F</button>
+                            <button id="signE" onclick="adminSign('E', '222', this)" class="px-2 py-1 bg-gray-50 rounded border text-xs text-blue-500 hover:bg-blue-50 transition">E</button>
+                            <button id="signM" onclick="adminSign('M', '333', this)" class="px-2 py-1 bg-gray-50 rounded border text-xs text-blue-500 hover:bg-blue-50 transition">M</button>
+                        </div>
+                    </div>
+                    <div class="p-4 border rounded text-center bg-white shadow-sm">
+                        <p class="font-bold mb-4 text-gray-700">ເຊັນພະນັກງານໂອທີ</p>
+                        <button id="signA" onclick="adminSign('A', '000', this)" class="text-xs text-blue-500 hover:text-blue-700 underline transition">ກົດເຊັນຊື່ (A)</button>
+                    </div>
+                </div>
+
+                <div class="mt-10 flex justify-center">
+                    <button id="saveBtn" onclick="submitForm()" class="bg-green-600 text-white px-12 py-4 rounded-full text-xl font-bold shadow-lg hover:bg-green-700 transform hover:scale-105 transition-all">
+                        ບັນທຶກຂໍ້ມູນທັງໝົດ
+                    </button>
+                </div>
+            </div>
+
+            <!-- 3. DATA LIST / HISTORY SECTION -->
+            <div id="historySection" class="bg-white rounded-xl shadow-md p-6 history-card">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-lg font-bold text-gray-800 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+                        ລາຍການຂໍ້ມູນທີ່ບັນທຶກແລ້ວ (ທັງໝົດ)
+                    </h3>
+                    <span id="recordCount" class="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded-full">0 ລາຍການ</span>
+                </div>
+                <div class="table-container border rounded-lg">
+                    <table class="w-full">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="text-xs">ວັນທີບັນທຶກ</th>
+                                <th class="text-xs">ຊື່ພະນັກງານ</th>
+                                <th class="text-xs">ໜ້າທີ່</th>
+                                <th class="text-xs">ປະຈຳເດືອນ</th>
+                                <th class="text-xs">ຈັດການ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historyTableBody">
+                            <tr>
+                                <td colspan="5" class="py-12 text-gray-400">ຍັງບໍ່ມີຂໍ້ມູນທີ່ບັນທຶກໃນຂະນະນີ້</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    // --- State Management ---
+    const config = { 
+        validEmail: "Namngiap2ABPower@gmail.com", // แก้ไขที่นี่ (เอาจุดออก)
+        validPass: "NG1234",
+        users: { 'Ng':'111', 'F':'111', 'E':'222', 'M':'333', 'O':'444', 'Admin':'555', 'A':'000' } 
+    };
+    let savedRecords = []; 
+    let currentEditId = null;
+
+    window.onload = () => {
+        renderTables();
+        checkAutoCleanup();
+    };
+
+    function checkAutoCleanup() {
+        if (new Date().getDate() === 29) {
+            savedRecords = [];
+            updateHistoryTable();
+            console.log("Auto-cleanup triggered.");
+        }
+    }
+
+    function renderTables() {
+        const mainBody = document.getElementById('mainTableBody');
+        const otBody = document.getElementById('otTableBody');
+        mainBody.innerHTML = ''; otBody.innerHTML = '';
+
+        for (let i = 1; i <= 31; i++) {
+            const dayStr = String(i).padStart(2, '0');
+            mainBody.innerHTML += `
+                <tr data-row="${i}">
+                    <td>${dayStr}</td>
+                    <td><input type="text" class="w-full text-xs task-input ${i===1?'input-auto':''}" oninput="${i===1?'syncInputs(\'task-input\', this.value)':''}"></td>
+                    <td><input type="text" class="w-full text-xs morning-in ${i===1?'input-auto':''}" oninput="${i===1?'syncInputs(\'morning-in\', this.value)':''}"></td>
+                    <td><input type="text" class="w-full text-xs morning-out ${i===1?'input-auto':''}" oninput="${i===1?'syncInputs(\'morning-out\', this.value)':''}"></td>
+                    <td><input type="text" class="w-full text-xs noon-in ${i===1?'input-auto':''}" oninput="${i===1?'syncInputs(\'noon-in\', this.value)':''}"></td>
+                    <td><input type="text" class="w-full text-xs noon-out ${i===1?'input-auto':''}" oninput="${i===1?'syncInputs(\'noon-out\', this.value)':''}"></td>
+                    <td><input type="text" class="w-full text-xs night-in ${i===1?'input-auto':''}" oninput="${i===1?'syncInputs(\'night-in\', this.value)':''}"></td>
+                    <td><input type="text" class="w-full text-xs night-out ${i===1?'input-auto':''}" oninput="${i===1?'syncInputs(\'night-out\', this.value)':''}"></td>
+                    <td><input type="number" class="w-full text-xs hr-norm" oninput="calcTotals()"></td>
+                    <td><input type="number" class="w-full text-xs hr-ot" oninput="calcTotals()"></td>
+                    <td><input type="number" class="w-full text-xs hr-hol" oninput="calcTotals()"></td>
+                    <td><button onclick="adminSign('Ng', '111', this)" class="text-[10px] bg-gray-100 px-2 py-1 rounded sign-btn hover:bg-gray-200">Sign</button></td>
+                </tr>`;
+            otBody.innerHTML += `
+                <tr data-row="${i}">
+                    <td>${i}</td>
+                    <td><input type="date" class="text-xs ot-date"></td>
+                    <td><input type="text" class="w-full text-xs ot-time" placeholder="08:00-17:00"></td>
+                    <td><input type="text" class="w-full text-xs ot-task ${i===1?'input-auto':''}" oninput="${i===1?'syncInputs(\'ot-task\', this.value)':''}"></td>
+                    <td><input type="text" class="w-full text-xs ot-result ${i===1?'input-auto':''}" oninput="${i===1?'syncInputs(\'ot-result\', this.value)':''}"></td>
+                    <td><button onclick="adminSignMulti(['F','E','M','O'], this)" class="text-[10px] bg-gray-50 px-2 py-1 rounded sign-btn hover:bg-100">Sign</button></td>
+                </tr>`;
+        }
+    }
+
+    function syncInputs(className, value) { document.querySelectorAll('.' + className).forEach(el => el.value = value); }
+    
+    function calcTotals() {
+        let n=0, o=0, h=0;
+        document.querySelectorAll('.hr-norm').forEach(el => n += Number(el.value || 0));
+        document.querySelectorAll('.hr-ot').forEach(el => o += Number(el.value || 0));
+        document.querySelectorAll('.hr-hol').forEach(el => h += Number(el.value || 0));
+        document.getElementById('totalNormal').innerText = n;
+        document.getElementById('totalOT').innerText = o;
+        document.getElementById('totalHoliday').innerText = h;
+    }
+
+    async function adminSign(targetUser, targetPass, btn) {
+        const { value: formValues } = await Swal.fire({
+            title: 'ຢືນຢັນລາຍເຊັນ',
+            html: `
+                <div class="mb-2 text-sm text-gray-500">Sign by: <b>${targetUser}</b></div>
+                <input id="swal-u" class="swal2-input" placeholder="Username" value="${targetUser}">
+                <input id="swal-p" type="password" class="swal2-input" placeholder="Password">`,
+            showCancelButton: true,
+            confirmButtonText: 'ຢືນຢັນ',
+            cancelButtonText: 'ຍົກເລີກ',
+            preConfirm: () => [document.getElementById('swal-u').value, document.getElementById('swal-p').value]
+        });
+        if (formValues && formValues[0] === targetUser && formValues[1] === targetPass) {
+            btn.innerHTML = `✓ ${targetUser}`; btn.setAttribute('data-signed', 'true'); btn.className = "text-xs font-bold text-green-600";
+        } else if (formValues) { Swal.fire('Error', 'ຂໍ້ມູນບໍ່ຖືກຕ້ອງ', 'error'); }
+    }
+
+    async function adminSignMulti(allowed, btn) {
+        const { value: res } = await Swal.fire({
+            title: 'ຢືນຢັນລາຍເຊັນ',
+            html: `<input id="swal-u" class="swal2-input" placeholder="Username"><input id="swal-p" type="password" class="swal2-input" placeholder="Password">`,
+            showCancelButton: true,
+            preConfirm: () => [document.getElementById('swal-u').value, document.getElementById('swal-p').value]
+        });
+        if (res && allowed.includes(res[0]) && config.users[res[0]] === res[1]) {
+            btn.innerHTML = `✓ ${res[0]}`; btn.setAttribute('data-signed', 'true'); btn.className = "text-xs font-bold text-blue-600";
+        } else if (res) { Swal.fire('Error', 'ທ່ານບໍ່ມີສິດເຂົ້າເຖິງ', 'error'); }
+    }
+
+    function handleLogin() {
+        const email = document.getElementById('loginEmail').value.trim();
+        const pass = document.getElementById('loginPassword').value;
+
+        if (email === config.validEmail && pass === config.validPass) {
+            Swal.fire({
+                title: 'ເຂົ້າສູ່ລະບົບສຳເລັດ',
+                text: 'ຍິນດີຕ້ອນຮັບເຂົ້າສູ່ Namngiap 2AB Power',
+                icon: 'success',
+                timer: 1500,
+                showConfirmButton: false
+            }).then(() => {
+                document.getElementById('loginPage').classList.add('hidden');
+                document.getElementById('dashboardPage').classList.remove('hidden');
+            });
+        } else { 
+            Swal.fire({
+                title: 'ຂໍ້ຜິດພາດ',
+                text: 'ອີເມວ ຫຼື ລະຫັດຜ່ານ ບໍ່ຖືກຕ້ອງ. ກະລຸນາລອງໃໝ່.',
+                icon: 'error',
+                confirmButtonText: 'ລອງໃໝ່'
+            }); 
+        }
+    }
+
+    function submitForm() {
+        const name = document.getElementById('staffName').value.trim();
+        const role = document.getElementById('staffRole').value.trim();
+        
+        if (!name) return Swal.fire('ແຈ້ງເຕືອນ', 'ກະລຸນາໃສ່ຊື່ພະນັກງານກ່ອນບັນທຶກ', 'warning');
+
+        Swal.fire({ 
+            title: 'ກຳລັງບັນທຶກ...', 
+            text: 'ກະລຸນາລໍຖ້າຈັກຄູ່',
+            allowOutsideClick: false,
+            didOpen: () => Swal.showLoading() 
+        });
+
+        setTimeout(() => {
+            const record = {
+                id: currentEditId || Date.now(),
+                timestamp: new Date().toLocaleString(),
+                staffName: name,
+                staffRole: role || "N/A",
+                workMonth: document.getElementById('workMonth').value || "N/A",
+                formData: {} 
+            };
+
+            if (currentEditId) {
+                const idx = savedRecords.findIndex(r => r.id === currentEditId);
+                if(idx !== -1) savedRecords[idx] = record;
+                currentEditId = null;
+                document.getElementById('saveBtn').innerText = "ບັນທຶກຂໍ້ມູນທັງໝົດ";
+                document.getElementById('saveBtn').className = "bg-green-600 text-white px-12 py-4 rounded-full text-xl font-bold shadow-lg hover:bg-green-700 transform hover:scale-105 transition-all";
+            } else {
+                savedRecords.unshift(record);
+            }
+
+            updateHistoryTable();
+            Swal.fire({
+                title: 'ບັນທຶກສຳເລັດ!',
+                icon: 'success',
+                timer: 2000,
+                showConfirmButton: false
+            }).then(() => clearFormData());
+        }, 1000);
+    }
+
+    function updateHistoryTable() {
+        const body = document.getElementById('historyTableBody');
+        const countSpan = document.getElementById('recordCount');
+        
+        countSpan.innerText = `${savedRecords.length} ລາຍການ`;
+        
+        if (savedRecords.length === 0) {
+            body.innerHTML = `<tr><td colspan="5" class="py-12 text-gray-400">ຍັງບໍ່ມີຂໍ້ມູນທີ່ບັນທຶກໃນຂະນະນີ້</td></tr>`;
+            return;
+        }
+        
+        body.innerHTML = savedRecords.map(rec => `
+            <tr class="hover:bg-gray-50 transition">
+                <td class="text-xs text-gray-500">${rec.timestamp}</td>
+                <td class="font-bold text-blue-900">${rec.staffName}</td>
+                <td class="text-xs">${rec.staffRole}</td>
+                <td class="text-xs">${rec.workMonth}</td>
+                <td class="space-x-2">
+                    <button onclick="editRecord(${rec.id})" class="text-blue-600 hover:text-blue-800 font-medium text-xs border border-blue-200 px-2 py-1 rounded hover:bg-blue-50">ແກ້ໄຂ</button>
+                    <button onclick="deleteRecord(${rec.id})" class="text-red-500 hover:text-red-700 font-medium text-xs border border-red-200 px-2 py-1 rounded hover:bg-red-50">ລົບ</button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    function editRecord(id) {
+        const rec = savedRecords.find(r => r.id === id);
+        if (rec) {
+            currentEditId = id;
+            document.getElementById('staffName').value = rec.staffName;
+            document.getElementById('staffRole').value = rec.staffRole;
+            document.getElementById('workMonth').value = rec.workMonth;
+            
+            const btn = document.getElementById('saveBtn');
+            btn.innerText = "ອັບເດດຂໍ້ມູນ (Update)";
+            btn.className = "bg-blue-600 text-white px-12 py-4 rounded-full text-xl font-bold shadow-lg hover:bg-blue-700 transform hover:scale-105 transition-all";
+            
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            Swal.fire({
+                title: 'ໂຫຼດຂໍ້ມູນແລ້ວ',
+                text: 'ທ່ານສາມາດແກ້ໄຂຂໍ້ມູນໄດ້ເລີຍ',
+                icon: 'info',
+                timer: 1500,
+                showConfirmButton: false
+            });
+        }
+    }
+
+    function deleteRecord(id) {
+        Swal.fire({
+            title: 'ຢືນຢັນການລົບ?',
+            text: "ທ່ານຈະບໍ່ສາມາດກູ້ຂໍ້ມູນນີ້ກັບຄືນໄດ້!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'ລົບເລີຍ',
+            cancelButtonText: 'ຍົກເລີກ'
+        }).then(res => {
+            if (res.isConfirmed) {
+                savedRecords = savedRecords.filter(r => r.id !== id);
+                updateHistoryTable();
+                Swal.fire('ລົບສຳເລັດ!', '', 'success');
+            }
+        });
+    }
+
+    function clearFormData() {
+        document.getElementById('staffName').value = '';
+        document.getElementById('staffRole').value = '';
+        document.querySelectorAll('input:not([type="password"]):not(#loginEmail)').forEach(i => { if(i.id !== 'locationInput') i.value = ''; });
+        document.querySelectorAll('.sign-btn').forEach(b => { 
+            b.innerHTML = 'Sign'; 
+            b.className = "text-[10px] bg-gray-100 px-2 py-1 rounded sign-btn hover:bg-gray-200"; 
+            b.removeAttribute('data-signed'); 
+        });
+        calcTotals();
+    }
+
+    function scrollToHistory() { document.getElementById('historySection').scrollIntoView({ behavior: 'smooth' }); }
+    function logout() { 
+        Swal.fire({
+            title: 'ຢືນຢັນການອອກຈາກລະບົບ?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'ຕົກລົງ',
+            cancelButtonText: 'ຍົກເລີກ'
+        }).then(res => {
+            if (res.isConfirmed) location.reload();
+        });
+    }
+</script>
+</body>
+</html>
